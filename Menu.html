@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍜 Girls Ramen Night!</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #ff6b9d;
+    --hot-pink: #ff3d7f;
+    --soft-pink: #ffe0ec;
+    --peach: #ffb347;
+    --cream: #fff8f0;
+    --red: #e8334a;
+    --dark: #2d1b2e;
+    --mid: #6b4c7a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--cream); min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: radial-gradient(circle at 10% 20%, #ffd6e8 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, #ffecd2 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #fff0f5 0%, transparent 60%);
+    z-index: -1;
+  }
+  .floaties { position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+  .floaty { position: absolute; font-size: 1.5rem; opacity: 0.15; animation: float linear infinite; }
+  @keyframes float { 0% { transform: translateY(110vh) rotate(0deg); } 100% { transform: translateY(-10vh) rotate(360deg); } }
+  header { text-align: center; padding: 2rem 1.5rem 1rem; }
+  .header-badge { display: inline-block; background: linear-gradient(135deg, var(--pink), var(--hot-pink)); color: white; font-family: 'Fredoka One', cursive; font-size: 0.85rem; letter-spacing: 2px; padding: 0.3rem 1rem; border-radius: 50px; margin-bottom: 0.75rem; box-shadow: 0 4px 15px rgba(255,107,157,0.4); }
+  h1 { font-family: 'Fredoka One', cursive; font-size: 2.4rem; color: var(--dark); line-height: 1.1; margin-bottom: 0.5rem; }
+  h1 span { background: linear-gradient(135deg, var(--hot-pink), var(--peach)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .subtitle { color: var(--mid); font-size: 0.95rem; font-weight: 600; }
+  .name-section { margin: 1.5rem 1.5rem 0; background: white; border-radius: 20px; padding: 1.25rem; box-shadow: 0 4px 20px rgba(255,107,157,0.12); border: 2px solid var(--soft-pink); }
+  .name-section label { display: block; font-weight: 800; color: var(--dark); margin-bottom: 0.5rem; font-size: 0.95rem; }
+  .name-section label span { color: var(--hot-pink); }
+  input[type="text"] { width: 100%; padding: 0.75rem 1rem; border: 2px solid #f0d0e0; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700; color: var(--dark); background: var(--cream); outline: none; transition: border-color 0.2s; }
+  input[type="text"]:focus { border-color: var(--pink); }
+  .progress-wrap { margin: 1.5rem 1.5rem 0; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 800; color: var(--mid); margin-bottom: 0.4rem; }
+  .progress-bar { height: 8px; background: var(--soft-pink); border-radius: 50px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--hot-pink)); border-radius: 50px; transition: width 0.4s ease; width: 0%; }
+  .section { margin: 1.5rem 1.5rem 0; opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
+  .section.visible { opacity: 1; transform: none; }
+  .section-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+  .section-number { width: 30px; height: 30px; background: linear-gradient(135deg, var(--pink), var(--hot-pink)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Fredoka One', cursive; font-size: 0.95rem; flex-shrink: 0; box-shadow: 0 3px 10px rgba(255,61,127,0.35); }
+  .section-title { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--dark); }
+  .section-subtitle { font-size: 0.75rem; color: var(--mid); font-weight: 600; margin-left: auto; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .choice-card { background: white; border-radius: 16px; border: 2.5px solid #f5e0ea; padding: 0.85rem 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s ease; position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.04); -webkit-tap-highlight-color: transparent; user-select: none; }
+  .choice-card:active { transform: scale(0.95); }
+  .choice-card.selected { border-color: var(--hot-pink); background: linear-gradient(135deg, #fff0f6, #ffe8f2); box-shadow: 0 4px 18px rgba(255,61,127,0.2); transform: scale(1.02); }
+  .choice-card .check { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: var(--hot-pink); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; opacity: 0; transform: scale(0); transition: all 0.2s ease; }
+  .choice-card.selected .check { opacity: 1; transform: scale(1); }
+  .choice-emoji { font-size: 2.2rem; display: block; margin-bottom: 0.4rem; line-height: 1; }
+  .choice-name { font-size: 0.78rem; font-weight: 800; color: var(--dark); line-height: 1.2; }
+  .choice-desc { font-size: 0.68rem; color: var(--mid); font-weight: 600; margin-top: 0.2rem; }
+  .multi-badge { display: inline-block; background: linear-gradient(135deg, #fff3cd, #ffe099); color: #7a5c00; font-size: 0.68rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 50px; margin-bottom: 0.5rem; }
+  .spice-row { display: flex; gap: 0.5rem; }
+  .spice-btn { flex: 1; padding: 0.75rem 0.4rem; border: 2.5px solid #f5e0ea; border-radius: 14px; background: white; cursor: pointer; text-align: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+  .spice-btn.selected { border-color: var(--red); background: linear-gradient(135deg, #fff0f0, #ffe8e8); box-shadow: 0 4px 15px rgba(232,51,74,0.2); }
+  .spice-emoji { font-size: 1.5rem; display: block; }
+  .spice-label { font-size: 0.7rem; font-weight: 800; color: var(--dark); margin-top: 0.2rem; }
+  textarea { width: 100%; padding: 0.85rem 1rem; border: 2px solid #f0d0e0; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--dark); background: white; outline: none; resize: none; height: 90px; transition: border-color 0.2s; }
+  textarea:focus { border-color: var(--pink); }
+  textarea::placeholder { color: #d0a0b8; }
+  .submit-wrap { margin: 2rem 1.5rem 3rem; }
+  .submit-btn { width: 100%; padding: 1.1rem; background: linear-gradient(135deg, var(--pink), var(--hot-pink)); color: white; border: none; border-radius: 18px; font-family: 'Fredoka One', cursive; font-size: 1.4rem; cursor: pointer; box-shadow: 0 6px 25px rgba(255,61,127,0.4); transition: all 0.2s; letter-spacing: 0.5px; }
+  .submit-btn:active { transform: scale(0.97); }
+  .success-screen { display: none; text-align: center; padding: 3rem 2rem; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; }
+  .success-screen.show { display: flex; }
+  .success-bowl { font-size: 5rem; margin-bottom: 1rem; animation: bounce 0.6s ease; }
+  @keyframes bounce { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+  .success-title { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--dark); margin-bottom: 0.5rem; }
+  .success-sub { color: var(--mid); font-weight: 700; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5; }
+  .order-card { background: white; border-radius: 20px; padding: 1.5rem; text-align: left; width: 100%; max-width: 360px; box-shadow: 0 6px 30px rgba(255,107,157,0.15); border: 2px solid var(--soft-pink); }
+  .order-card h3 { font-family: 'Fredoka One', cursive; color: var(--hot-pink); font-size: 1.1rem; margin-bottom: 1rem; text-align: center; }
+  .order-row { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.5rem 0; border-bottom: 1px dashed #f5e0ea; font-size: 0.85rem; }
+  .order-row:last-child { border-bottom: none; }
+  .order-key { font-weight: 800; color: var(--mid); min-width: 80px; font-size: 0.8rem; }
+  .order-val { font-weight: 700; color: var(--dark); flex: 1; }
+  .copy-btn { margin-top: 1.25rem; width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #25d366, #128c7e); color: white; border: none; border-radius: 14px; font-family: 'Fredoka One', cursive; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 18px rgba(37,211,102,0.35); }
+  .new-order-btn { margin-top: 0.75rem; width: 100%; padding: 0.75rem; background: white; color: var(--hot-pink); border: 2.5px solid var(--pink); border-radius: 14px; font-family: 'Fredoka One', cursive; font-size: 1.1rem; cursor: pointer; }
+  .main-form.hide { display: none; }
+</style>
+</head>
+<body>
+
+<div class="floaties" id="floaties"></div>
+
+<div class="main-form" id="mainForm">
+
+  <header>
+    <div class="header-badge">✨ GIRLS NIGHT ✨</div>
+    <h1>Build Your<br><span>Ramen Bowl!</span> 🍜</h1>
+    <p class="subtitle">Pick your perfect bowl for tonight 💕</p>
+  </header>
+
+  <div class="name-section">
+    <label>Your name <span>*</span></label>
+    <input type="text" id="nameInput" placeholder="e.g. Sarah 🌸" oninput="updateProgress()" />
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Your bowl</span><span id="progressText">0% done</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <!-- STEP 1: Bowl -->
+  <div class="section visible" id="s1">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <div class="section-title">Choose Your Bowl 🫙</div>
+    </div>
+    <div class="grid">
+      <div class="choice-card" onclick="select(this,'bowl','Red bowl')" data-group="bowl">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🔴</span>
+        <div class="choice-name">Red</div>
+        <div class="choice-desc">bold & bright</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'bowl','White bowl')" data-group="bowl">
+        <div class="check">✓</div>
+        <span class="choice-emoji">⚪</span>
+        <div class="choice-name">White</div>
+        <div class="choice-desc">clean & simple</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'bowl','Cartoon bowl')" data-group="bowl">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🐱</span>
+        <div class="choice-name">Cartoon</div>
+        <div class="choice-desc">cute & fun</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'bowl','Surprise me!')" data-group="bowl">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🎁</span>
+        <div class="choice-name">Surprise me!</div>
+        <div class="choice-desc">chef's choice</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Noodles -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <div class="section-title">Choose Your Noodles 🍜</div>
+    </div>
+    <div class="grid">
+      <div class="choice-card" onclick="select(this,'noodles','Shin Ramyun')" data-group="noodles">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🔴</span>
+        <div class="choice-name">Shin Ramyun</div>
+        <div class="choice-desc">classic spicy</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'noodles','Carbo Buldak')" data-group="noodles">
+        <div class="check">✓</div>
+        <span class="choice-emoji">💗</span>
+        <div class="choice-name">Carbo Buldak</div>
+        <div class="choice-desc">creamy & spicy</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'noodles','Toomba Shin Ramyun')" data-group="noodles">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🍛</span>
+        <div class="choice-name">Toomba Shin</div>
+        <div class="choice-desc">rich & creamy</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'noodles','Kimchi Shin Ramyun')" data-group="noodles">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🥬</span>
+        <div class="choice-name">Kimchi Shin</div>
+        <div class="choice-desc">tangy & spicy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Egg -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <div class="section-title">Egg Style 🥚</div>
+    </div>
+    <div class="grid">
+      <div class="choice-card" onclick="select(this,'egg','Fried egg')" data-group="egg">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🍳</span>
+        <div class="choice-name">Fried</div>
+        <div class="choice-desc">sunny side up</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'egg','Soft boiled egg')" data-group="egg">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🥚</span>
+        <div class="choice-name">Soft Boiled</div>
+        <div class="choice-desc">jammy yolk</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'egg','Poached egg')" data-group="egg">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🫧</span>
+        <div class="choice-name">Poached</div>
+        <div class="choice-desc">silky & smooth</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'egg','No egg')" data-group="egg">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🚫</span>
+        <div class="choice-name">No egg</div>
+        <div class="choice-desc">skip it</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Protein -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <div class="section-title">Protein 🍗</div>
+      <span class="section-subtitle">pick one</span>
+    </div>
+    <div class="grid">
+      <div class="choice-card" onclick="select(this,'protein','Shrimp')" data-group="protein">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🍤</span>
+        <div class="choice-name">Shrimp</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'protein','Katsu chicken')" data-group="protein">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🍗</span>
+        <div class="choice-name">Katsu Chicken</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'protein','Grilled chicken')" data-group="protein">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🔥</span>
+        <div class="choice-name">Grilled Chicken</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'protein','Bacon')" data-group="protein">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🥓</span>
+        <div class="choice-name">Bacon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: Veggies (multi) -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <div class="section-title">Veggies & Toppings 🥬</div>
+    </div>
+    <div class="multi-badge">✨ Pick as many as you want!</div>
+    <div class="grid grid-3">
+      <div class="choice-card multi" onclick="toggleMulti(this,'veggies','Green onions')" data-group="veggies">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🌿</span>
+        <div class="choice-name">Green Onion</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'veggies','Mushrooms')" data-group="veggies">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🍄</span>
+        <div class="choice-name">Mushrooms</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'veggies','Parsley')" data-group="veggies">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🌱</span>
+        <div class="choice-name">Parsley</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'veggies','Carrots')" data-group="veggies">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🥕</span>
+        <div class="choice-name">Carrots</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'veggies','Dumplings')" data-group="veggies">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🥟</span>
+        <div class="choice-name">Dumplings</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'veggies','Cabbage')" data-group="veggies">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🥬</span>
+        <div class="choice-name">Cabbage</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6: Extra toppings (multi) -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-number">6</div>
+      <div class="section-title">Extra Toppings ✨</div>
+    </div>
+    <div class="multi-badge">✨ Pick as many as you want!</div>
+    <div class="grid grid-3">
+      <div class="choice-card multi" onclick="toggleMulti(this,'extras','Nori (seaweed)')" data-group="extras">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🌊</span>
+        <div class="choice-name">Nori</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'extras','Cheese')" data-group="extras">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🧀</span>
+        <div class="choice-name">Cheese</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'extras','Sesame seeds')" data-group="extras">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🌾</span>
+        <div class="choice-name">Sesame Seeds</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'extras','Extra broth')" data-group="extras">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🫕</span>
+        <div class="choice-name">Extra Broth</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'extras','Chili oil')" data-group="extras">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🌶️</span>
+        <div class="choice-name">Chili Oil</div>
+      </div>
+      <div class="choice-card multi" onclick="toggleMulti(this,'extras','Chili flakes')" data-group="extras">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🔥</span>
+        <div class="choice-name">Chili Flakes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 7: Spice -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-number">7</div>
+      <div class="section-title">Spice Level 🌶️</div>
+    </div>
+    <div class="spice-row">
+      <button class="spice-btn" onclick="selectSpice(this,'No spice')">
+        <span class="spice-emoji">😌</span>
+        <div class="spice-label">None</div>
+      </button>
+      <button class="spice-btn" onclick="selectSpice(this,'Mild')">
+        <span class="spice-emoji">🙂</span>
+        <div class="spice-label">Mild</div>
+      </button>
+      <button class="spice-btn" onclick="selectSpice(this,'Medium')">
+        <span class="spice-emoji">😅</span>
+        <div class="spice-label">Medium</div>
+      </button>
+      <button class="spice-btn" onclick="selectSpice(this,'Spicy!')">
+        <span class="spice-emoji">🥵</span>
+        <div class="spice-label">Spicy!</div>
+      </button>
+      <button class="spice-btn" onclick="selectSpice(this,'Extra spicy 🔥')">
+        <span class="spice-emoji">💀</span>
+        <div class="spice-label">Death</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 8: Cutlery -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-number">8</div>
+      <div class="section-title">Cutlery 🥢</div>
+    </div>
+    <div class="grid">
+      <div class="choice-card" onclick="select(this,'cutlery','Chopsticks')" data-group="cutlery">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🥢</span>
+        <div class="choice-name">Chopsticks</div>
+        <div class="choice-desc">authentic style</div>
+      </div>
+      <div class="choice-card" onclick="select(this,'cutlery','Fork')" data-group="cutlery">
+        <div class="check">✓</div>
+        <span class="choice-emoji">🍴</span>
+        <div class="choice-name">Fork</div>
+        <div class="choice-desc">western style</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-number">💬</div>
+      <div class="section-title">Any Notes?</div>
+    </div>
+    <textarea id="notes" placeholder="Allergies, special requests, or just send love to the chef 💕"></textarea>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="submit-btn" onclick="submitOrder()">Submit My Order 🍜</button>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-bowl">🍜</div>
+  <h2 class="success-title">Order Received! 🎉</h2>
+  <p class="success-sub">Now send it to the host on WhatsApp!<br>Can't wait for tonight ✨💕</p>
+  <div class="order-card" id="orderSummary">
+    <h3>🌸 Your Custom Bowl</h3>
+    <div id="orderDetails"></div>
+  </div>
+  <button class="copy-btn" onclick="sendWhatsApp()">💬 Send to Host on WhatsApp</button>
+  <button class="new-order-btn" onclick="resetForm()">↩ Edit My Order</button>
+</div>
+
+<script>
+const selections = { bowl:'', noodles:'', egg:'', protein:'', veggies:[], extras:[], spice:'', cutlery:'' };
+
+const emojis = ['🍜','🌸','✨','💕','🥢','🍳','🌶️','🎀'];
+const floaties = document.getElementById('floaties');
+for(let i=0;i<12;i++){
+  const el=document.createElement('div'); el.className='floaty';
+  el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+  el.style.left=Math.random()*100+'%';
+  el.style.animationDuration=(8+Math.random()*12)+'s';
+  el.style.animationDelay=(Math.random()*10)+'s';
+  floaties.appendChild(el);
+}
+
+setTimeout(()=>{
+  document.querySelectorAll('.section').forEach((s,i)=>{
+    setTimeout(()=>s.classList.add('visible'),i*120);
+  });
+},300);
+
+function select(card,group,value){
+  document.querySelectorAll(`[data-group="${group}"]`).forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected'); selections[group]=value; updateProgress();
+}
+
+function toggleMulti(card,group,value){
+  card.classList.toggle('selected');
+  if(card.classList.contains('selected')){ if(!selections[group].includes(value)) selections[group].push(value); }
+  else { selections[group]=selections[group].filter(v=>v!==value); }
+  updateProgress();
+}
+
+function selectSpice(btn,level){
+  document.querySelectorAll('.spice-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected'); selections.spice=level; updateProgress();
+}
+
+function updateProgress(){
+  const name=document.getElementById('nameInput').value.trim();
+  const required=[name,selections.bowl,selections.noodles,selections.egg,selections.protein,selections.spice,selections.cutlery];
+  const done=required.filter(Boolean).length;
+  const pct=Math.round((done/required.length)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=pct+'% done';
+}
+
+function submitOrder(){
+  const name=document.getElementById('nameInput').value.trim();
+  if(!name){alert('Please enter your name! 💕');return;}
+  if(!selections.bowl){alert('Pick a bowl! 🫙');return;}
+  if(!selections.noodles){alert('Pick your noodles! 🍜');return;}
+  if(!selections.egg){alert('Choose an egg style! 🥚');return;}
+  if(!selections.protein){alert('Pick a protein! 🍗');return;}
+  if(!selections.spice){alert('How spicy? 🌶️');return;}
+  if(!selections.cutlery){alert('Chopsticks or fork? 🥢');return;}
+  const notes=document.getElementById('notes').value.trim();
+  const rows=[
+    ['Name',name],['Bowl',selections.bowl],['Noodles',selections.noodles],
+    ['Egg',selections.egg],['Protein',selections.protein],
+    ['Veggies',selections.veggies.length?selections.veggies.join(', '):'None'],
+    ['Extras',selections.extras.length?selections.extras.join(', '):'None'],
+    ['Spice',selections.spice],['Cutlery',selections.cutlery],
+    ['Notes',notes||'None']
+  ];
+  let html='';
+  rows.forEach(([k,v])=>{html+=`<div class="order-row"><div class="order-key">${k}</div><div class="order-val">${v}</div></div>`;});
+  document.getElementById('orderDetails').innerHTML=html;
+  document.getElementById('mainForm').classList.add('hide');
+  document.getElementById('successScreen').classList.add('show');
+  window.scrollTo(0,0);
+  window._orderText='🍜 RAMEN NIGHT ORDER 🍜\n'+rows.map(([k,v])=>`${k}: ${v}`).join('\n');
+}
+
+function sendWhatsApp(){
+  const msg=encodeURIComponent(window._orderText);
+  window.open('https://wa.me/966552896000?text='+msg,'_blank');
+}
+
+function resetForm(){
+  document.getElementById('mainForm').classList.remove('hide');
+  document.getElementById('successScreen').classList.remove('show');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
